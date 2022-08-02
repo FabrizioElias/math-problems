@@ -1,0 +1,1 @@
+Math problems from https://projecteuler.net solved in Rust
