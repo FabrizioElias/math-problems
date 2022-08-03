@@ -13,13 +13,13 @@ fn main() {
         println!();
         match choosen.to_lowercase().as_str().trim() {
             "1" => {
-                println!("Collatz took {}ms", timed_execution_with_argument(solvers::collatz::collatz, choose_limit()).as_millis());
+                println!("Collatz took {}ms", timed_execution(solvers::collatz::collatz, choose_limit::<u64>()).as_millis());
             }
             "2" => {
-                println!("Prime summation (simple) took {}ms", timed_execution_with_argument(solvers::prime_summation::prime_sum_simple, choose_limit()).as_millis());
+                println!("Prime summation (simple) took {}ms", timed_execution(solvers::prime_summation::prime_sum_simple, choose_limit::<u64>()).as_millis());
             }
             "3" => {
-                println!("Prime summation (Sieve of Erastothenes) took {}ms", timed_execution_with_argument(solvers::prime_summation::prime_sum_sieve_erastothenes, choose_limit()).as_millis());
+                println!("Prime summation (Sieve of Erastothenes) took {}ms", timed_execution(solvers::prime_summation::prime_sum_sieve_erastothenes, choose_limit::<u64>()).as_millis());
             }
             "x" => {
                 println!("Goodbye!");
@@ -44,16 +44,18 @@ fn print_menu() {
     stdout().flush().expect("Failed to flush STDOUT");
 }
 
-fn timed_execution_with_argument(function_to_time: fn(u64), argument: u64) -> std::time::Duration { 
+fn timed_execution<T>(function_to_time: fn(T), argument: T) -> std::time::Duration { 
     let sw = Stopwatch::start_new();
     function_to_time(argument);
     sw.elapsed()
 }
 
-fn choose_limit() -> u64 {
+fn choose_limit<T: std::str::FromStr + std::fmt::Debug>() -> T where
+    T: std::str::FromStr, //T must implement the trait FromStr
+    T::Err: std::fmt::Debug { //The error from T must implement the Debug trait
     let mut choosen_limit = String::new();
     print!("Choose a limit (number, greater than zero): ");
     stdout().flush().expect("Failed to flush STDOUT");
     stdin().read_line(&mut choosen_limit).expect("Failed to read line");
-    choosen_limit.trim().parse::<u64>().expect("Cannot parse limit")
+    choosen_limit.trim().parse::<T>().expect("Cannot parse limit")
 }
